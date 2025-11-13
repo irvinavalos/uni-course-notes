@@ -1,0 +1,192 @@
+\section{Introduction to Divide and Conquer Algorithms}
+
+We begin by examining the implementation of obtaining the $n^{\text{th}}$
+Fibonacci number,
+\begin{algorithm}
+  \SetKwFunction{FFib}{Fibonacci}
+  \SetKwProg{Fn}{function}{:}{}
+  \Fn{\FFib{$n$}}{
+    \If{$n = 0$}{
+      \KwRet $0$\;
+    }
+    \If{$n = 1$}{
+      \KwRet $1$\;
+    }
+    \KwRet \FFib{$n-1$} + \FFib{$n-2$}\;
+  }
+\end{algorithm}
+where the number of compute steps is given by
+\begin{equation}
+  T(n) =
+  \begin{cases}
+    \hfil C_{1} & n = 0 \\
+    \hfil C_{2} & n = 1 \\
+    C_{3} + T(n-1) + T(n-2) & \text{else}
+  \end{cases}
+  .
+\end{equation}
+Here $T(n)$ is bounded between $2^{n/2}$ and $2^{n}$ leading
+to a time complexity of $O(2^n)$. This is obviously very bad and so
+one of the main things we must always ask ourselves when designing an
+algorithm is: \textit{Can we do better?} In this case we can do
+better by moving away from a recursive approach to an iterative one.
+This is because, through each recursion we sometimes recompute values
+that can be found elsewhere in the recursive tree, e.g., $f_{n-4} =
+f_{n-3} + f_{n-2}$ where $f_{n-3} = f_{n-2} + f_{n-1}$ and thus end
+up computing $f_{n-2}$ twice. This should make light of why, for
+higher values of $n$, the number of computer steps needed to compute
+$f_n$ is $2^n$.
+\begin{algorithm}
+  \SetKwFunction{FFib}{FibonacciIterative}
+  \SetKwProg{Fn}{function}{:}{}
+  \Fn{\FFib{$n$}}{
+    \If{$n = 0$}{
+      \KwRet $0$\;
+    }
+    \tcp{initialize an array $f$ of size $n$ and}
+    \tcp{populate index $0$ and $1$ with $f_{0}, f_{1}$ respectively}
+    $f[0 \ldots n]$\;
+    $f[0] = 0$, $f[1] = 1$\;
+    \tcp{populate the rest of $f$ with $i^{\text{th}}$ Fibonacci no.}
+    \For{$i \gets 2$ \KwTo $n$}{
+      $f[i] = f[i-1] + f[i-2]$\;
+    }
+    \KwRet $f[n]$\;
+  }
+\end{algorithm}
+The reason why the iterative method reduces the number of operations is due to,
+\begin{itemize}
+  \item Array initialization of $f$ takes \textit{constant work}
+  \item Setting each $f_{i}$ is a constant operation $C$
+\end{itemize}
+In total, this approach takes $nC$ computer steps leading to a time
+complexity of $O(n)$, much better than $O(2^n)$.
+
+\subsection{Efficiency of an Algorithm}
+
+From the previous example, it should become clear that when designing
+an algorithm it is important to analyze its running time for very
+large inputs. Under this perspective, we do not care about constants
+and amongst multiple terms, e.g., $n, n^{2}, n^{3}$ we choose the
+one that \textit{grows} the fastest.
+\begin{definition}[Big O Notation]
+  Let $f(n)$ and $g(n)$ be functions from ${\mathbb{Z}}^{+}
+  \rightarrow R$ where $R$ denotes the number of computer steps.
+  Define $f = O(g)$ if and only if $f \leq g$ and if there exists a
+  constant $c$ such that $\forall n \in { \mathbb{Z} }^{+},\ f(n) \leq c\ g(n)$.
+\end{definition}
+
+\subsection{Integer Addition and Multiplication}
+
+An operation that we use a good amount of the time is that of adding
+and multiplying two or more different quantities together. In the
+case of addition, the algorithm that we are taught runs in $O(n)$
+time since it is just an element-wise operation, e.g., adding two
+arbitrary numbers $a$ and $b$ can be written as
+\begin{align*}
+  a + b &= (a_{0} + a_{1} \times 10 + a_{2} \times 100 + \ldots) +
+  (b_{0} + b_{1} \times 10 + b_{2} \times 100 + \ldots) \\
+  &= (a_{0} + b_{0}) + 10\ (a_{1} + b_{1}) + 100\ (a_{2} + b_{2}) + \ldots
+\end{align*}
+However, the typical algorithm that we are taught for multiplication
+proves to be very inefficient. For example, suppose that we multiply
+two arbitrary numbers $c$ and $d$,
+\begin{align*}
+  c \times d &= c \times (d_{0} + d_{1} \times 10 + d_{2} \times 100
+  + \ldots) \\
+  &= (c \times d_{0}) + (c \times d_{1} \times 10) + (c \times d_{2}
+  \times 100) + \ldots
+\end{align*}
+where $c$ can be further decomposed into $c = c_{0} + c_{1} \times 10
++ c_{2} \times 100 + \ldots$, and thus yielding a run time of
+$O(n^2)$ since each base 10 value of $c$ is multiplied to to each
+base 10 of $d$.
+
+\subsubsection{Multiplication using Divide and Conquer Approach}
+
+At this point, you should be questioning yourself as to whether or
+not we can improve the runtime of the typical multiplication
+algorithm (\textit{Recall: Can we do better?}). Unsurprisingly we can
+do better by breaking the problem into \textit{smaller} sub-problems,
+solving them, and combining the results at the end. Now suppose that
+we are multiplying two numbers $x$ and $y$ each consisting of $n$
+digits. Before continuing, we will make one important assumption on
+$n$ in that $n = 2^k$ for $k \in \mathbb{Z}^+$ (i.e., $n$ is an
+integer multiple of $2$). Thus,
+\begin{equation*}
+  x = x_{L}^{n/2} + x_{R} \quad \text{and} \quad y = y_{L}^{n/2} + y_{R}
+\end{equation*}
+and their multiplication becomes
+\begin{align*}
+  x \times y &= (x_{L}^{n/2} + x_{R}) \times (y_{L}^{n/2} + y_{R}) \\
+  &= x_{L}\ y_{L}\ 2^n + (x_{L}\ y_{R} + x_{R}\ y_{L})^{n/2} + x_{R}\ y_{R}
+\end{align*}
+Putting this all together we can devise the following algorithm,
+\begin{algorithm}
+  \SetKwInput{Input}{Input}
+  \SetKwInput{Output}{Output}
+  \SetKwFunction{FMul}{Mult}
+  \SetKwProg{Fn}{function}{:}{}
+
+  \Input{$x, y$ are $n$-bit positive integers}
+  \Output{$x \times y$}
+
+  \Fn{\FMul{$x, y$}}{
+    \If{$n = 1$}{
+      \KwRet{$x \times y$}\;
+    }
+    $x_{L}, x_{R}\ =\ left\ \lceil n/2 \rceil,\ right\ \lfloor n/2
+    \rfloor$ bits of $x$\;
+    $y_{L}, y_{R}\ =\ left\ \lceil n/2 \rceil,\ right\ \lfloor n/2
+    \rfloor$ bits of $y$\;
+    $p_{1}, p_{2}, p_{3}, p_{4}\ =\ $ \FMul{$x_{L}, y_{L}$},
+    \FMul{$x_{L}, y_{R}$}, \FMul{$x_{R}, y_{L}$}, \FMul{$x_{R}, y_{R}$}\;
+    \KwRet{$p_{1}\ 2^{n} + (p_{2} + p_{3})\ 2^{n/2} + p_{4}$}\;
+  }
+\end{algorithm}
+where the $T(n)$ := number of steps taken to multiply two $n$-digit
+numbers is given by
+\begin{equation*}
+  T(n) = 4 T(n/2) + O(n)
+\end{equation*}
+and the total work is then,
+\begin{equation*}
+  1 \times O(n) + 4 \times O(n/2) + 4^{2} \times O(n/2^{2}) + \ldots
+  + 4^{\log_{2}n} \times O\left(\dfrac{n}{2^{\log_{2}n}}\right).
+\end{equation*}
+One way to think about this is to envision the recursive tree and
+notice that for the $k^{\text{th}}$ level we create a total of
+$4^{k}$ sub-problems. Through each recursion we also split the two
+input integers into two halves (left and right) and so we have at
+most $\log_{2}n$ levels in the tree. Now, make note of the following fact,
+\begin{itemize}
+  \item Given a geometric progression: $1, \alpha, \alpha^2, \ldots,
+    \alpha^k$ with $\alpha > 1$, the runtime is equivalent to the
+    last term, i.e., $O(\alpha^{k})$
+\end{itemize}
+Given this we can now say that the time complexity of the total work is
+\begin{equation*}
+  O\left(4^{\log_{2}n} \times \dfrac{n}{2^{\log_{2}n}}\right) =
+  O\left(\left(2^{\log_{2}n}\right)^2 \times \dfrac{n}{n}\right) =
+  O\left(n^2\right).
+\end{equation*}
+However, we said we could improve it by subdividing the problem into
+smaller ones but we have not improved it's time complexity at all.
+Well notice that
+\begin{equation*}
+  x_{L} y_{R} + x_{R} y_{L} = (x_{L} + x_{R})(y_{L} + y_{R}) - x_{L}
+  y_{L} - x_{R} y_{R}
+\end{equation*}
+where we have already compute the term $-(x_{L} y_{L} + x_{R} y_{R})$
+which means that one multiplication rather than two suffices such
+that, $T(n) = 3 T(n/2) + O(n)$ and so
+\begin{align*}
+  T(n) &= O(n) + 3 O(n/2) + 3^2 O(n/2^2) + \ldots + 3^{\log_{2}n}
+  O\left(\dfrac{n}{2^{\log_{2}n}}\right) \\
+  &= O\left(3^{\log_{2}n} \times \dfrac{n}{2^{\log_{2}n}}\right) \\
+  &= O\left(n^{\log_{2}3}\right) \\
+  &\approxeq O\left(n^{1.59}\right)
+\end{align*}
+While it may not look like we have made a major improvement one can
+easily see that for \textit{large} sized integers $n^{1.59}$ grows
+much slower than $n^2$, and thus we have achieved a \textit{faster} runtime.
