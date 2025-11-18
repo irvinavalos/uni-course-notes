@@ -1,0 +1,97 @@
+\section{Discrete Probability}
+
+At it's core probability is a principled way of reasoning
+about uncertainty,
+\begin{displayquote}
+  Probability is common sense reduced to calculations --- Laplace
+\end{displayquote}
+\begin{definition}[Sample Space, $\Omega$]
+  The sample space of an experiment is the set of all possible
+  outcomes of said experiment.
+\end{definition}
+\begin{definition}[Event]
+  An event $A$ is any allowable subset of $\Omega$.
+\end{definition}
+\begin{definition}[Probability Space]
+  A probability space $(\Omega, \mathcal{F}, P)$ is a mathematical
+  construct used to model experiments.
+  \begin{itemize}
+    \item $\Omega$: set of all possible outcomes
+    \item $\mathcal{F}$: set of all events
+    \item $P$: probability measure
+  \end{itemize}
+\end{definition}
+
+\subsection{Probability Axioms}
+
+There exists three fundamental rules that make probability work,
+\begin{enumerate}
+  \item The probability of nothing occurring is zero,
+    \begin{equation*}
+      P(\emptyset) = 0.
+    \end{equation*}
+  \item The probability of everything occurring is one,
+    \begin{equation*}
+      P(\Omega) = 1.
+    \end{equation*}
+    This comes as a direct consequence from the previous statement.
+  \item Given a sequence of disjoint events $A_{1}, A_{2}, \ldots$, then
+    \begin{equation*}
+      P(A_{1} \cup A_{2} \cup \ldots) = P(A_{1}) + P(A_{2}) + \ldots
+    \end{equation*}
+\end{enumerate}
+Regarding the third probability axiom, if we are given a finite sequence
+of events $A_{1}, A_{2}, \ldots, A_{n}$ (whether or not they are
+disjoint) we have
+\begin{equation*}
+  P(\bigcup_{i=1}^n A_{i}) \leq \sum_{i=1}^{n} P(A_{i}).
+\end{equation*}
+In other words, the probability of $\bigcup_{i=1}^{n} A_{i}$ is at
+most the sum of the individual probabilities $\sum_{i=1}^{n}
+P(A_{i})$. This is known as the \textbf{union bound}.
+
+\subsection{Discrete Probability Law}
+
+For any event $A$ in some $\Omega$,
+\begin{equation*}
+  P(A) = \sum_{\omega \in A} P(\omega)
+\end{equation*}
+and if $\Omega$ is uniform then
+\begin{equation*}
+  P(A) = \frac{|A|}{|\Omega|}.
+\end{equation*}
+This fact is essential when computing probabilities over discrete
+sets of outcomes.
+\begin{example}[Birthday Paradox]
+  Suppose that there are $n \geq 2$ people in a room. We want to find
+  the probability that \textit{at least two people have the same
+  birthday}. Ignoring leap years, we accomplish this by first
+  assuming that every person's birthday is assigned uniformly at random
+  and that there are $k$ number of distinct birthdays (less
+  abstractly $k$ can be at most 365). Let
+  \begin{equation*}
+    A = \{\text{\textit{at least two people share the same
+    birthday}}\} \text{ and }
+    A^C = \{\text{\textit{no two people share the same birthday}}\}
+  \end{equation*}
+  then
+  \begin{equation*}
+    P(A^C) = \frac{k \times (k - 1) \times (k - 2) \times \ldots (k-n+1)}{k
+    \times k \times k \times \ldots k} = \prod_{i=0}^{n-1}
+    \frac{k-i}{k} = \prod_{i=0}^{n-1} \left(1 - \frac{i}{k}\right)
+  \end{equation*}
+  where for $n > k$ the product becomes zero (by the pigeonhole
+  principle) and $P(A) = 1$. Otherwise for $n < k$ we can take the
+  log of the probability and use the fact that $\log(1 - x) \approx
+  -x$ (given small enough $x$),
+  \begin{equation*}
+    \log P(A^C) = \sum_{i=0}^{n-1} \log(1 - \frac{i}{k}) \approxeq
+    -\frac{1}{k} \sum_{i=0}^{n-1} i = -\frac{n(n-1)}{2k}
+  \end{equation*}
+  exponentiating both sides yields
+  \begin{equation*}
+    P(A^C) = \exp \left(-\frac{n(n-1)}{2k}\right).
+  \end{equation*}
+  So $P(A) = 1 -e^{-n(n-1)/2k}$ and notice that as the number of people
+  increases $e^{-n(n-1)/2k} \to 0$ for a fixed value of $k$.
+\end{example}
