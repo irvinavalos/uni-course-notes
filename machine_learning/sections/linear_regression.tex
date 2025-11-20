@@ -1,0 +1,114 @@
+\section{Linear Regression}
+
+Suppose we are given a dataset $\mathcal{D} =
+\{\mathbf{x}_{1},\mathbf{x}_{2,\ldots,\mathbf{x}_{N}}\}$ where
+each $\mathbf{x}_{n} \in \mathbb{R}^D$ has a corresponding target
+$t_{n} \in \mathbb{R}$. The goal is to predict one or more
+unknown continuous targets $t$ when given a new vector $\mathbf{x}$
+of input variables. To accomplish this we say that
+the prediction for $t$ is given by the function $y(\mathbf{x},\mathbf{w})$
+where $\mathbf{w} \in \mathbb{R}^{D+1}$ is a vector of parameters
+that can be learned from the training data.
+
+\subsection{Simple Linear Regression}
+
+The simplest linear regression model is,
+\begin{equation*}
+  y(\mathbf{x}, \mathbf{w}) = w_{0} + w_{1}x_{1} + w_{2}x_{2} +
+  \ldots + w_{D}x_{D}
+\end{equation*}
+where the predictions are linear in both weight space and feature
+space. As such, the predicted values, y, form a $D+1$ dimensional hyperplane.
+
+\subsubsection{Basis Functions}
+
+However, linear regression does not only have to be used to model
+data with linear behavior in the feature space. That is, nonlinear
+data in feature space can be modeled using linear regression via the
+use of basis functions:
+\begin{equation*}
+  y(\mathbf{x}, \mathbf{w}) = w_{0} + \sum_{j=1}^{M-1} w_{j}
+  \phi_{j}(\mathbf{x}).
+\end{equation*}
+Our predictions are then only linear in parameter space, no longer in
+feature space as we are taking a linear combination of weighted
+parameters corresponding to the results from inputting data through a
+fixed nonlinear function, $\phi(\cdot)$.
+
+\subsection{Matrix-Vector Notation}
+
+Going back to the simple linear regression model, we can rewrite it
+by extending $\mathbf{x} \in \mathbb{R}^D$ to include $x_{0} = 1$
+such that the predictions become
+\begin{equation*}
+  y(\mathbf{x}, \mathbf{w}) = w_{0}x_{0} + w_{1}x_{1} + \ldots +
+  w_{D}x_{D} = \sum_{d=0}^{D} w_{d}x_{d} = \mathbf{w}^T \mathbf{x} =
+  \mathbf{x}^T \mathbf{w}.
+\end{equation*}
+Assuming our dataset consists of $N$ samples we can write the predictions as
+\begin{equation*}
+  \begin{cases}
+    y(\mathbf{x}_{1}, \mathbf{w}) \quad = \quad w_{0} + w_{1}x_{11} +
+    w_{2}x_{12} + \ldots + w_{D}x_{1D} \quad = \quad \mathbf{x}_{1}^T
+    \mathbf{w} \\
+    y(\mathbf{x}_{2}, \mathbf{w}) \quad = \quad w_{0} + w_{1}x_{21} +
+    w_{2}x_{22} + \ldots + w_{D}x_{2D} \quad = \quad \mathbf{x}_{2}^T
+    \mathbf{w} \\
+    \qquad \vdots \\
+    y(\mathbf{x}_{N}, \mathbf{w}) \quad = \quad w_{0} + w_{1}x_{N1} +
+    w_{2}x_{N2} + \ldots + w_{D}x_{ND} \quad = \quad \mathbf{x}_{N}^T
+    \mathbf{w} \\
+  \end{cases}
+\end{equation*}
+where $\mathbf{x}_{i} = [1, x_{i1}, x_{i2}, \ldots, x_{iN}]^T$ for $i
+\in \{1,2,\ldots,N\}$. From this we can now introduce the design matrix
+\begin{equation*}
+  \mathbf{X} =
+  \begin{bmatrix}
+    \leftarrow & \mathbf{x}_{1} & \rightarrow \\
+    \leftarrow & \mathbf{x}_{2} & \rightarrow \\
+    & \vdots & \\
+    \leftarrow & \mathbf{x}_{N} & \rightarrow
+  \end{bmatrix} \in \mathbb{R}^{N \times (D + 1)}
+\end{equation*}
+which allows us to once again rewrite the predictions as
+\begin{equation*}
+  \mathbf{Y}(\mathbf{X}, \mathbf{w}) = \mathbf{X} \mathbf{w}, \quad
+  \mathbf{Y} \in \mathbb{R}^N
+\end{equation*}
+\subsection{Error Function}
+An important question that you should be asking yourself at this
+point is: \textit{How do we exactly compute the weights
+$\mathbf{w}$?}. As it turns out, this is a very simple task as we
+accomplish this by minimizing the \textit{error function}
+\begin{equation*}
+  E(w) = \frac{1}{2} \sum_{n=1}^{N} \left( t_{n} - y(x_{n}, w) \right)^2
+\end{equation*}
+which measures the \textit{misfit} between the targets and
+predictions. Note that $E(w)$ is a quadratic function, then
+$\frac{\partial}{\partial w} E(w)$ is a linear function and solving
+$\frac{\partial}{\partial w} E(w) = 0$ yields only one solution, thus
+simplifying the minimization problem.
+\begin{itemize}
+  \item Minimization w.r.t. $w_{0}$:
+    \begin{align*}
+      \frac{\partial E(w)}{\partial w_{0}} &=
+      \frac{\partial}{\partial w_{0}} \frac{1}{2} \sum_{n=1}^{N}
+      ( t_{n} - w_{0} - \sum_{d=1}^{D} w_{d} x_{nd} )^2 \\
+      &= \frac{1}{2} \sum_{n=1}^{N} -2( t_{n} - w_{0} -
+      \sum_{d=1}^{D} w_{d} x_{nd} ) \\
+      &= \sum_{n=1}^{N} -t_{n} + \sum_{n=1}^{N} w_{0} +
+      \sum_{n=1}^{N} \sum_{d=1}^{D} w_{d} x_{nd} \\
+      w_{0}^{\star} &= \frac{1}{N} \sum_{n=1}^{N} t_{n} -
+      \sum_{d=1}^{D} w_{d} \cdot \frac{1}{N} \sum_{n=1}^{N} x_{nd}
+    \end{align*}
+    $\therefore$ the \textit{bias parameter} measures the difference
+    between the average of the targets and the weighted sum of the
+    average of the inputs.
+  \item Minimization w.r.t. $w_{k}$:
+    \begin{align*}
+       \frac{\partial E(w)}{\partial w_{k}} &=
+      \frac{\partial}{\partial w_{k}} \frac{1}{2} \sum_{n=1}^{N}
+      ( t_{n} - w_{0} - \sum_{d=1}^{D} w_{d} x_{nd} )^2 \\     
+    \end{align*}
+\end{itemize}
