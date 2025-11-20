@@ -1,0 +1,76 @@
+\section{Support Vector Machines}
+Before we explore the technicalities behind the \textbf{maximal
+margin classifier} we must introduce and define what a \textbf{hyperplane} is.
+\begin{definition}
+  In $D$ dimensional space, a \textbf{hyperplane} is an
+  affine subspace of dimension $D - 1$. Geometrically, it divides the
+  $D$ dimensional space into two half-spaces. A hyperplane can be written as
+  \begin{equation*}
+    b + w_{1} x_{1} + w_{2} x_{2} + \ldots + w_{D} x_{D} =
+    \mathbf{w}^T \mathbf{x} + b = 0,
+  \end{equation*}
+  where $\mathbf{x} = (x_{1},x_{2},\ldots,x_{D})^T$, $\mathbf{w} =
+  (w_{1},w_{2},\ldots,w_{D})^T$, and $b \in \mathbb{R}$. From this,
+  we can say that:
+  \begin{itemize}[left=0pt]
+    \item $\mathbf{x}$ lies to the left of the hyperplane if
+      \begin{equation*}
+        \mathbf{w}^T \mathbf{x} + b < 0.
+      \end{equation*}
+    \item $\mathbf{x}$ lies to the right of the hyperplane if
+      \begin{equation*}
+        \mathbf{w}^T \mathbf{x} + b > 0.
+      \end{equation*}
+    \item Otherwise $\mathbf{x}$ is said to lie on the hyperplane when
+      \begin{equation*}
+        \mathbf{w}^T \mathbf{x} + b = 0.
+      \end{equation*}
+  \end{itemize}
+\end{definition}
+Using this new knowledge suppose that we are given the dataset $\mathbf{X} =
+\{\mathbf{x}_{1},\mathbf{x}_{2},\ldots,\mathbf{x}_{N}\}$ where
+$\mathbf{x}_{i} \in \mathbb{R}^D$. Every data point
+will fall into one of two \textit{classes}, i.e., we will assign to
+each $\mathbf{x}_{i}$ a term $y_{i} \in \{-1, 1\}$. Finally, we will
+include a test observation $\mathbf{x}^{\star} =
+(x_{1}^{\star},x_{2}^{\star},\ldots,x_{D}^{\star})^T$. Our goal now
+is to create a linear classifier that will correctly classify this test
+observation using its features. To do this we will use the idea of a
+\textit{separating hyperplane}, i.e., we will create a hyperplane
+such that each point falls into one of the two sides from this
+hyperplane. Therefore, we can assign a label to each observation
+using the function $f(\mathbf{x}) = \mathbf{w}^T \mathbf{x}$ such that
+\begin{equation*}
+  f(\mathbf{x}_{i}) =
+  \begin{cases}
+    \mathbf{w}^T \mathbf{x}_{i} + b > 0 & \text{if } y_{i} = 1 \\
+    \mathbf{w}^T \mathbf{x}_{i} + b < 0 & \text{if } y_{i} = -1
+  \end{cases}.
+\end{equation*}
+\begin{itemize}[left=0pt]
+  \item Note that to correctly classify every point $i =
+    1,2,\ldots,N$ we require,
+    \begin{equation*}
+      y_{i} (\mathbf{w}^T \mathbf{x}_{i} + b) > 0.
+    \end{equation*}
+  \item Additionally, the magnitude $|f(\mathbf{x})|$ indicates how
+    far a point lies from the \textit{decision boundary} (i.e.,
+    hyperplane). Thus, points with values close to zero lie near this boundary.
+\end{itemize}
+A central challenge is that when data is linearly separable, there
+exist infinitely many hyperplanes that satisfy our linear
+classifier's constraints. This motivates the need to find the
+\textbf{maximal margin classifier}. Conceptually, this classifier
+depends on the \textit{margin}, defined as the smallest perpendicular distance
+from the separating hyperplane to any point. More formally, to
+obtain the maximal margin hyperplane we solve
+\begin{mini*}|s|
+  {b,\mathbf{w},M}{M}{}{}
+  \addConstraint{\sum_{i=1}^D w_{i}^{2} = 1}
+  \addConstraint{y_i (\mathbf{w}^T \mathbf{x}_i + b) \geq
+  M\ \forall\ i = 1,2,\ldots,N}
+\end{mini*}
+where $M$ denotes the margin. The constraint $\sum_{i=1}^{D}w_{i}^{2}
+= 1$ normalizes the weight vector such that $M$ represents the
+geometric margin, and the optimization looks for the hyperplane that
+maximizes this value.
